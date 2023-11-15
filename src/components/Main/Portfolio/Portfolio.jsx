@@ -20,7 +20,7 @@ const Portfolio = () => {
           <li className="portfolio__item">
             <a
               className="portfolio__link link"
-              href="https://github.com/VEBata/russian-travel"
+              href="https://vebata.github.io/russian-travel"
               target="_blank"
               rel="noopener noreferrer"
             >
