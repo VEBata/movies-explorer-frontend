@@ -1,0 +1,100 @@
+.card {
+  max-width: 364px;
+  width: 100%;
+  margin: 0;
+  position: relative;
+  list-style-type: none;
+  border-radius: 6px;
+  background-color: #222222;
+}
+@media (max-width: 1110px) {
+  .card {
+    max-width: 339px;
+  }
+}
+@media (max-width: 500px) {
+  .card {
+    max-width: 300px;
+  }
+}
+.card__image {
+  width: 100%;
+  display: block;
+  border-radius: 6px 6px 0 0;
+}
+
+.card__container {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 16px 0;
+}
+
+.card__title {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+  margin: 0;
+  padding: 7px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__button-like {
+  width: 30px;
+  height: 30px;
+  background-image: url("../../../images/heart.svg");
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px, 12px;
+}
+
+.card__button-like_active {
+  background-image: url("../../../images/heart-active.svg");
+}
+
+.card__duration {
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  color: #8b8b8b;
+  margin: 10px 16px 15px;
+
+}
+
+@media (max-width: 769px) {
+  .card__container {
+    margin: 10px 14px 0;
+  }
+
+  .card__title {
+    padding: 6px 0 0;
+  }
+
+  .card__duration {
+    margin: 7px 14px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .card__container {
+    margin: 7px 0 0;
+  }
+
+  .card__title {
+    font-size: 12px;
+    line-height: 15px;
+    padding: 8px 0 0;
+    margin: 0 0 0 14px;
+  }
+
+  .card__button-like {
+    margin: 0 10px 0 0;
+  }
+
+  .card__duration {
+    font-size: 10px;
+    line-height: 12px;
+  }
+}

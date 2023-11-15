@@ -1,0 +1,24 @@
+.navigation__button-profile {
+	font-weight: 500;
+	font-size: 13px;
+	line-height: 12px;
+	color: #FFFFFF;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	column-gap: 7px;
+	min-width: 89px;
+}
+
+.navigation__button-profile-img {
+	display: flex;
+	height: 11px;
+	width: 11px;
+	border-radius: 50%;
+	background-color: #0F4157;
+	padding: 8px;
+}
+
+.navigation__button-profile-img_color_black {
+	background-color: #313131;
+}

@@ -1,0 +1,39 @@
+.content {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.button-wrapper {
+	margin: 67px 70px 90px;
+	width: 100%;
+	max-width: 1140px;
+}
+
+
+.button-load {
+	min-width: 100%;
+	min-height: 36px;
+	border-radius: 6px;
+	background-color: #2F2F2F;
+	color: #FFFFFF;
+	text-align: center;
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+@media (max-width: 769px) {
+	.button-wrapper {
+		margin: 63px 70px 92px;
+		max-width: 708px;
+	}
+}
+
+@media (max-width: 420px) {
+	.button-wrapper {
+		margin: 64px 70px 78px;
+		max-width: 300px;
+	}
+}
