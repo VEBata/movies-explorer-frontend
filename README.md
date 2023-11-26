@@ -1,1 +1,1 @@
-# ovies-explorer-frontend
+# movies-explorer-frontend
