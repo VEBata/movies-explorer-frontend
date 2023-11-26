@@ -2,13 +2,13 @@ const BASE_URL = "https://api.khve.nomoredomainsrocks.ru";
 const MOVIES_API_IMG_URL = "https://api.nomoreparties.co";
 const MOVIES_API_URL = "https://api.nomoreparties.co/beatfilm-movies";
 
-const PROFILE_UPDATE_ERROR = "При обновлении профиля произошла ошибка.";
-const PROFILE_UPDATE_COMPLETED = "Данные успешно обновлены.";
+const PROFILE_UPDATE_ERROR = "При обновлении профиля произошла ошибка";
+const PROFILE_UPDATE_COMPLETED = "Данные обновлены";
 const EMPTY_REQUEST = "Введите критерий для поиска";
 const MOVIE_TITLE = "Фильм";
-const NOTHING_FOUND = "Ничего не найдено.";
+const NOTHING_FOUND = "Не найдено";
 const SERVER_ERROR =
-  "Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.";
+  "Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз";
 
 const SHORT_FILM_MIN = 40;
 

@@ -8,8 +8,8 @@
 
 IP 158.160.121.214
 
-[Frontend](khve.nomoredomainsrocks.ru)
+[Frontend](https://github.com/VEBata/movies-explorer-frontend/tree/level-3)
 
-[Backend](api.khve.nomoredomainsrocks.ru)
+[Backend](https://github.com/VEBata/movies-explorer-api/tree/main)
 
 [Pull-request](https://github.com/VEBata/movies-explorer-frontend/pull/2)

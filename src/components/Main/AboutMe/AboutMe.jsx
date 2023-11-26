@@ -1,6 +1,6 @@
 import "./AboutMe.css";
 import SectionTitle from "../SectionTitle/SectionTitle";
-import avatar from "../../../images/avatar.jpg";
+import avatar from "../../../images/avatar.png";
 
 const AboutMe = () => {
   return (
