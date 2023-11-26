@@ -11,7 +11,7 @@ const AboutMe = () => {
           <h3 className="about-me__name">Виктор</h3>
           <p className="about-me__about">Фронтенд-разработчик, 25 лет</p>
           <p className="about-me__description">
-            Я живу в городе Москва.
+            Я живу в городе Москве.
           </p>
           <a
             className="about-me__link link"
