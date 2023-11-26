@@ -1,0 +1,29 @@
+.header__nav-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 30px;
+}
+
+.header__nav-item {
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.header__nav-item:last-child {
+	border: none;
+	outline: 0;
+	cursor: pointer;
+	padding: 8px 20px;
+	border-radius: 3px;
+	background-color: #3ddc84;
+}
+
+.header__nav-link {
+	text-decoration: none;
+	color: #000000;
+}

@@ -1,0 +1,16 @@
+.login {
+height: 266px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.login__error {
+	font-weight: 400;
+	font-size: 11px;
+	line-height: 13px;
+	color: #FF004C;
+	text-align: center;
+	margin: 36px 0 33px;
+	height: 0;
+}
