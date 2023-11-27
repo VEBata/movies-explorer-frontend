@@ -8,8 +8,8 @@ const AboutMe = () => {
       <div className="about-me__container">
         <SectionTitle title="Студент" />
         <article className="about-me__content">
-          <h3 className="about-me__name">Виктор</h3>
-          <p className="about-me__about">Фронтенд-разработчик, 25 лет</p>
+          <h3 className="about-me__name">VE</h3>
+          <p className="about-me__about">Фронтенд-разработчик, 26 лет</p>
           <p className="about-me__description">
             Я живу в городе Москве.
           </p>
