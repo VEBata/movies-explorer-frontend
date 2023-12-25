@@ -6,7 +6,7 @@
 
 ## Проект
 
-IP 62.84.114.156
+IP 158.160.36.213
 
 [Frontend](https://github.com/VEBata/movies-explorer-frontend/tree/level-3)
 
