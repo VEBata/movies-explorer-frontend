@@ -1,38 +1,17 @@
 .page {
-	background-color: #202020;
-	width: 100%;
-	min-height: 100vh;
+  background-color: #202020;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .page__container {
-	max-width: 1280px;
-	margin: 0 auto;
-	font-family: "Inter", Arial, sans-serif;
-	color: #FFFFFF;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-text-size-adjust: 100%;
-	-ms-text-size-adjust: 100%;
-	-moz-text-size-adjust: 100%;
-}
-
-.link {
-	text-decoration: none;
-	color: #FFFFFF;
-	transition: opacity .3s ease;
-}
-
-.link:hover {
-	opacity: 0.7;
-}
-
-.button {
-	border: none;
-	cursor: pointer;
-	transition: opacity .3s ease;
-}
-
-.button:hover {
-	opacity: 0.8;
+  margin: 0 auto;
+  font-family: "Inter", Arial, sans-serif;
+  color: #FFFFFF;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
 }

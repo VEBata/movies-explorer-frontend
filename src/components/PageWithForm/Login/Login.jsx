@@ -1,37 +1,66 @@
 import './Login.css';
-import Input from '../Input/Input';
-import SubmitButton from '../SubmitButton/SubmitButton';
-import PageWithForm from '../PageWithForm';
-import { useFormValidator } from "../../../hooks/useFormValidator";
+import { Input } from '../../Atoms/Input/Input';
+import { SubmitButton } from '../../Atoms/SubmitButton/SubmitButton';
+import { PageWithForm } from '../PageWithForm';
+import './Login.css';
+import { useState, useEffect } from 'react';
 
-const Login = ({ onLogin, isServerError, isDisabledInput }) => {
-	const { values, errors, isFormValid, handleChange, resetForm } = useFormValidator();
+export const Login = ({ onLogin, isServerError, isDisabledInput }) => {
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
+	const [isFormValid, setIsFormValid] = useState(false);
+	const [errors, setErrors] = useState({});
+	useEffect(() => {
+		setEmail('')
+    setPassword('')
+		setErrors({})
+		setIsFormValid(false)
+	}, []);
 
-	const onSubmit = (evt) => {
+	const onSubmit = async(evt) => {
 		evt.preventDefault();
-		onLogin(values.email, values.password);
-		resetForm()
+		await onLogin(email, password);
+		// resetForm()
 	};
 
+  const handleChangeEmail = (event) => {
+    setEmail(event.target.value)
+    setErrors({
+      ...errors,
+      email: event.target.validationMessage,
+    });
+
+    setIsFormValid(event.target.closest(".form"));
+  }
+
+  const handleChangePassword = (event) => {
+    setPassword(event.target.value)
+    setErrors({
+      ...errors,
+      password: event.target.validationMessage
+    });
+
+    setIsFormValid(event.target.closest(".form"));
+  }
+
 	return (
-		<main className="content">
+		<main className="content login">
 			<PageWithForm
 				title="Рады видеть!"
 				formName="login-form"
 				question="Ещё не зарегистрированы?"
 				link="/signup"
 				linkTitle="Регистрация"
-				onLogin={onLogin}
-				onSubmit={onSubmit}
+				// onLogin={onLogin}
 			>
-				<div className="login">
+				<div className='login__wrapper'>
 					<Input
 						name="email"
 						type="email"
 						title="E-mail"
-						value={values.email || ''}
+						value={email || ''}
 						pattern="^\S+@\S+\.\S+$"
-						onChange={handleChange}
+						onChange={handleChangeEmail}
 						required={true}
 						validationMessage={errors.email}
 						minLength="2"
@@ -45,8 +74,8 @@ const Login = ({ onLogin, isServerError, isDisabledInput }) => {
 						name="password"
 						type="password"
 						title="Пароль"
-						value={values.password || ''}
-						onChange={handleChange}
+						value={password || ''}
+						onChange={handleChangePassword}
 						required={true}
 						validationMessage={errors.password}
 						minLength="8"
@@ -63,10 +92,9 @@ const Login = ({ onLogin, isServerError, isDisabledInput }) => {
 				<SubmitButton
 					title="Войти"
 					isFormValid={isFormValid}
+					onClick={(e) => onSubmit(e)}
 				/>
 			</PageWithForm>
 		</main>
 	);
 }
-
-export default Login;

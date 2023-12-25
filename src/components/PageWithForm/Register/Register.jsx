@@ -1,10 +1,10 @@
 import './Register.css';
-import Input from '../Input/Input';
-import SubmitButton from '../SubmitButton/SubmitButton';
-import PageWithForm from '../PageWithForm';
+import { Input } from '../../Atoms/Input/Input';
+import { SubmitButton } from '../../Atoms/SubmitButton/SubmitButton';
+import { PageWithForm } from '../PageWithForm';
 import { useFormValidator } from "../../../hooks/useFormValidator";
 
-const Register = ({ onRegister, isServerError, isDisabledInput }) => {
+export const Register = ({ onRegister, isServerError, isDisabledInput }) => {
 	const { values, errors, isFormValid, handleChange, resetForm } = useFormValidator();
 
 	const onSubmit = (evt) => {
@@ -14,16 +14,15 @@ const Register = ({ onRegister, isServerError, isDisabledInput }) => {
 	};
 
 	return (
-		<main className="content">
+		<main className='register'>
 			<PageWithForm
 				title="Добро пожаловать!"
 				formName="register-form"
 				question="Уже зарегистрированы?"
 				link="/signin"
 				linkTitle="Войти"
-				onSubmit={onSubmit}
 			>
-				<div className="register">
+				<div className='register__wrapper'>
 					<Input
 						name="name"
 						type="text"
@@ -64,16 +63,15 @@ const Register = ({ onRegister, isServerError, isDisabledInput }) => {
 						disabled={isDisabledInput}
 					/>
 				</div>
-				<span className="register__error">
+				<span className='register__error'>
 					{isServerError}
 				</span>
 				<SubmitButton
 					title="Зарегистрироваться"
 					isFormValid={isFormValid}
+          onClick={onSubmit}
 				/>
 			</PageWithForm>
 		</main>
 	);
 }
-
-export default Register;

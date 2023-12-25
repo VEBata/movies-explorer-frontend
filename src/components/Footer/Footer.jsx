@@ -1,6 +1,6 @@
 import "./Footer.css";
 
-const Footer = () => {
+export const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
@@ -10,24 +10,24 @@ const Footer = () => {
       </h4>
       <div className="footer__content">
         <p className="footer__copyright">&copy; {year}</p>
-        <nav className="footer__links">
-          <ul className="footer__links-list">
+        <nav>
+          <ul className="footer__links">
             <li className="footer__item">
               <a
-                className="link"
                 href="https://praktikum.yandex.ru/"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="footer__link link"
               >
                 Яндекс.Практикум
               </a>
             </li>
             <li className="footer__item">
               <a
-                className="link"
                 href="https://github.com/VEBata"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="footer__link link"
               >
                 Github
               </a>
@@ -38,5 +38,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export default Footer;

@@ -1,118 +1,82 @@
-import './Movies.css';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { SearchForm } from '../Atoms/SearchForm/SearchForm';
+import { MoviesCards } from './MoviesCards/MoviesCards';
+import * as movieApi from '../../utils/MoviesApi';
 import { filterByDuration, filterMovies } from "../../utils/MoviesFilter";
-import SearchForm from '../Movies/SearchForm/SearchForm';
-import MoviesCardList from '../Movies/MoviesCardList/MoviesCardList';
-import * as moviesApi from '../../utils/MoviesApi'
+import './MoviesCards/MoviesCards.css';
+import './Movies.css'
 
-const Movies = ({ savedMovies, onSaveMovie, onDeleteMovie }) => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [initialMoviesList, setInitialMoviesList] = useState([]);
-	const [filteredMoviesList, setFilteredMoviesList] = useState([]);
-	const [isCheckboxActive, setIsCheckboxActive] = useState(false);
-	const [isNotFound, setIsNotFound] = useState(false);
-	const [isSearching, setIsSearching] = useState(false);
-	const [isResultStatus, setResultStatus] = useState(false);
+export const Movies = ({ onSaveMovie, onDeleteMovie, savedMovies }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [movies, setMovies] = useState([]);
+  const [filteredMoviesList, setFilteredMoviesList] = useState([]);
 
-	const getFilterMovies = (movies, searchQuery, isCheckbox) => {
-		const findedFilms = filterMovies(movies, searchQuery, isCheckbox);
-		setInitialMoviesList(findedFilms);
-		setFilteredMoviesList(isCheckbox ? filterByDuration(findedFilms) : findedFilms);
-		localStorage.setItem('movies', JSON.stringify(findedFilms));
-		localStorage.setItem('allMovies', JSON.stringify(movies));
-	}
+  const [isCheckboxActive, setIsCheckboxActive] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
+  const [isResultStatus, setResultStatus] = useState(false);
 
-	const handleFilter = () => {
-		setIsCheckboxActive(!isCheckboxActive);
-		if (!isCheckboxActive) {
-			if (filterByDuration(initialMoviesList).length === 0) {
-				setFilteredMoviesList(filterByDuration(initialMoviesList));
-			} else {
-				setFilteredMoviesList(filterByDuration(initialMoviesList));
-			}
-		} else {
-			setFilteredMoviesList(initialMoviesList);
-		}
-		localStorage.setItem('shortMovies', !isCheckboxActive);
-	}
+  useEffect(() => {
+    setIsCheckboxActive(localStorage.getItem('shortMovies') === 'true');
+  }, []);
 
-	const handleSearchMovies = (searchRequest) => {
-		setIsSearching(searchRequest)
-		localStorage.setItem('movieSearch', searchRequest);
-		localStorage.setItem('shortMovies', isCheckboxActive);
-		if (localStorage.getItem('allMovies')) {
-			const movies = JSON.parse(localStorage.getItem('allMovies'));
-			getFilterMovies(movies, searchRequest, isCheckboxActive);
-		} else {
-			setIsLoading(true);
-			moviesApi
-				.getMovies()
-				.then((dataCards) => {
-					getFilterMovies(dataCards, searchRequest, isCheckboxActive);
-					setResultStatus(false)
-				})
-				.catch((err) => {
-					setResultStatus(true)
-					console.log(err);
-				})
-				.finally(() => {
-					setIsLoading(false);
-				});
-		}
-	}
+  useEffect(() => {
+    if (!movies.length) {
+      setIsLoading(true);
+      movieApi.getMovies()
+        .then(data => {
+          setMovies(data);
+          localStorage.setItem('allMovies', JSON.stringify(data));
+          setFilteredMoviesList(isCheckboxActive ? filterByDuration(data) : data);
+        })
+        .catch(err => {
+          console.error(`Error fetching movies: ${err}`);
+          setResultStatus(true);
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [movies, isCheckboxActive]);
 
-	useEffect(() => {
-		if (localStorage.getItem('shortMovies') === 'true') {
-			setIsCheckboxActive(true);
-		} else {
-			setIsCheckboxActive(false);
-		}
-	}, []);
+  useEffect(() => {
+    setIsNotFound(filteredMoviesList.length === 0);
+  }, [filteredMoviesList]);
 
-	useEffect(() => {
-		if (localStorage.getItem('movies')) {
-			const movies = JSON.parse(localStorage.getItem('movies'));
-			setInitialMoviesList(movies);
-			if (localStorage.getItem('shortMovies') === 'true') {
-				setFilteredMoviesList(filterByDuration(movies));
-			} else {
-				setFilteredMoviesList(movies);
-			}
-		}
-	}, []);
+  const handleSearchMovies = (searchRequest) => {
+    if (searchRequest.trim().length === 0) {
+      setFilteredMoviesList(movies);
+    } else {
+      const foundMovies = filterMovies(movies, searchRequest);
+      setFilteredMoviesList(isCheckboxActive ? filterByDuration(foundMovies) : foundMovies);
+    }
+    localStorage.setItem('movieSearch', searchRequest);
+  };
 
-	useEffect(() => {
-		if (localStorage.getItem('movieSearch')) {
-			if (filteredMoviesList.length === 0) {
-				setIsNotFound(true);
-			} else {
-				setIsNotFound(false);
-			}
-		} else {
-			setIsNotFound(false);
-		}
-	}, [filteredMoviesList]);
+  const handleFilter = () => {
+    setIsCheckboxActive(!isCheckboxActive);
+    localStorage.setItem('shortMovies', JSON.stringify(!isCheckboxActive));
+    if (localStorage.getItem('shortMovies') === 'true') {
+      setFilteredMoviesList(filterByDuration(movies));
+    } else {
+      setFilteredMoviesList(movies);
+    }
+  };
 
-	return (
-		<main className="content">
-			<SearchForm
-				onSearch={handleSearchMovies}
-				onFilter={handleFilter}
-				isCheckboxActive={isCheckboxActive}
-			/>
-			<MoviesCardList
-				savedMovies={savedMovies}
-				onSaveMovie={onSaveMovie}
-				onDeleteMovie={onDeleteMovie}
-				filteredMoviesList={filteredMoviesList}
-				isSavedFilms={false}
-				isNotFound={isNotFound}
-				isResultStatus={isResultStatus}
-				isLoading={isLoading}
-				isSearching={isSearching}
-			/>
-		</main>
-	);
-}
-
-export default Movies;
+  return (
+    <main className='movies'>
+      <SearchForm
+        onSearch={handleSearchMovies}
+        onFilter={handleFilter}
+        isCheckboxActive={isCheckboxActive}
+      />
+      <MoviesCards
+        onSaveMovie={onSaveMovie}
+        onDeleteMovie={onDeleteMovie}
+        filteredMoviesList={filteredMoviesList}
+        isSavedFilms={false}
+        isNotFound={isNotFound}
+        isResultStatus={isResultStatus}
+        isLoading={isLoading}
+        savedMovies={savedMovies}
+      />
+    </main>
+  );
+};

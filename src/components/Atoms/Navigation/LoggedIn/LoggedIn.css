@@ -1,0 +1,31 @@
+.nav__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.nav__list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 0 45px;
+  display: flex;
+  gap: 16px;
+}
+
+.nav__link {
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.nav__link.active {
+  font-weight: 500;
+}
+
+@media (max-width: 769px) {
+  .nav__list {
+    display: none;
+  }
+}

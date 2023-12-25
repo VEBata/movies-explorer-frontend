@@ -1,125 +1,120 @@
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import './App.css';
-import Header from '../Header/Header';
-import Main from '../Main/Main';
-import Footer from '../Footer/Footer';
-import Movies from '../Movies/Movies';
-import SavedMovies from '../Movies/SavedMovies/SavedMovies';
-import Register from '../PageWithForm/Register/Register';
-import Login from '../PageWithForm/Login/Login';
-import Profile from '../Profile/Profile';
-import PageNotFound from "../PageNotFound/PageNotFound";
-import CurrentUserContext from '../contexts/CurrentUserContext';
+import { useState, useEffect } from "react";
+import { Routes, Route, useLocation, Navigate, useNavigate, redirect } from "react-router-dom";
+import { Home } from "../Home/Home";
+import { Movies } from "../Movies/Movies";
+import { PageNotFound } from '../PageNotFound/PageNotFound'
+import { Login } from '../PageWithForm/Login/Login'
+import { Register } from '../PageWithForm/Register/Register'
+import { Profile } from '../Profile/Profile'
+import { SavedMovies } from '../Movies/SavedMovies/SavedMovies'
+import { Header } from "../Atoms/Header/Header";
+import { ProtectedRoute } from '../ProtectedRoute'
+import { Footer } from '../Footer/Footer'
+import CurrentUserContext from '../../contexts/CurrentUserContext';
 import * as mainApi from '../../utils/MainApi';
-import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import * as movieApi from '../../utils/MoviesApi';
 import { PROFILE_UPDATE_ERROR, PROFILE_UPDATE_COMPLETED } from '../../utils/Constants';
+import './App.css'
 
+function App() {
+  const location = useLocation().pathname;
+  const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState({});
+  const [isServerError, setIsServerError] = useState('');
+  const [isDisabledInput, setIsDisabledInput] = useState(false);
+  const [savedMovies, setSavedMovies] = useState([]);
+  const [movies, setMovies] = useState([]);
 
-const App = () => {
-	const location = useLocation().pathname;
-	const navigate = useNavigate();
+  const [token, setToken] = useState('')
+  const [submitMessage, setSubmitMessage] = useState('');
 
-	const [loggedIn, setLoggedIn] = useState(false);
-	const [currentUser, setCurrentUser] = useState({});
-	const [isServerError, setIsServerError] = useState('');
-	const [submitMessage, setSubmitMessage] = useState('');
-	const [isDisabledInput, setIsDisabledInput] = useState(false);
-	const [savedMovies, setSavedMovies] = useState([]);
+  useEffect(() => {
+    if (token && localStorage.getItem('token')) {
+      Promise.all([mainApi.getDataUser(), movieApi.getMovies()])
+        .then(([userData, moviesData]) => {
+          setCurrentUser(userData);
+          localStorage.setItem('allMovies', JSON.stringify(moviesData.reverse()))
+          setMovies(moviesData.reverse());
+        })
+        .catch(err => console.error(`Error: ${err}`));
+    }
+  }, [token]);
 
-	const headerEndpoints = (
-		location === "/" ||
-		location === "/movies" ||
-		location === "/saved-movies" ||
-		location === "/profile"
-	);
-	const footerEndpoints = (
-		location === '/movies' ||
-		location === '/saved-movies' ||
-		location === '/'
-	);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      mainApi.getContent(token)
+        .then(data => {
+          setCurrentUser(data);
+          setLoggedIn(true);
+        })
+        .catch(err => {
+          console.error(`Error: ${err}`);
+          logout();
+        });
+      movieApi.getMovies()
+        .then((data) => {
+          setMovies(data)
+          localStorage.setItem('allMovies', JSON.stringify(data))
+        })
+      mainApi.getDataMovies()
+        .then(data => {
+          setSavedMovies(data)
+        })
+    }
+  }, []);
 
-	useEffect(() => {
-		loggedIn && Promise.all([mainApi.getDataUser(), mainApi.getDataMovies()])
-			.then(([data, movies]) => {
-				setCurrentUser(data)
-				setSavedMovies(movies.reverse());
-			})
-			.catch((err) => {
-				console.error(`Promise.all - ошибка: ${err}`);
-			})
-			.finally(() => {
-			})
-	}, [loggedIn])
+  const logout = () => {
+    localStorage.clear();
+    setLoggedIn(false);
+    navigate('/');
+    setCurrentUser({});
+  };
 
-	const handleTokenCheck = () => {
-		const token = localStorage.getItem('token');
-		if (!token) {
-			return;
-		}
-		mainApi
-			.getContent(token)
-			.then((data) => {
-				if (data) {
-					setCurrentUser(data);
-					setLoggedIn(true);
-					navigate(location);
-				}
-			})
-			.catch((err) => {
-				console.error(`handleTokenCheck - ошибка: ${err}`)
-				onExit();
-			});
-	};
+  const handleRegistration = async (name, email, password) => {
+    setIsDisabledInput(true);
 
-	useEffect(() => {
-		handleTokenCheck();
-	}, [])
+    await mainApi.registration(name, email, password)
+      .then(async(data) => {
+        setTimeout(async () => {
+          if (data) {
+            await handleLogin(email, password);
+          }
+        }, 1000)
+        
+      })
+      .catch((err) => {
+        setIsServerError(err.message || 'Ошибка регистрации');
+        console.error(`Ошибка регистрации: ${err}`);
+      })
+      .finally(() => {
+        setIsDisabledInput(false);
+      });
+  };
 
-	const onExit = () => {
-		localStorage.clear();
-		setLoggedIn(false);
-		navigate('/');
-		setCurrentUser({});
-	};
+  const handleLogin = async (email, password) => {
+    setIsDisabledInput(false);
+    mainApi.authorization(email, password)
+      .then((data) => {
+        if (data && data.token) {
+          localStorage.setItem('token', data.token);
+          setLoggedIn(true);
+          navigate('/movies');
+        } else {
+          throw new Error('Ошибка авторизации');
+        }
+      })
+      .catch((err) => {
+        setIsServerError(err.message || 'Ошибка авторизации');
+        console.error(`Ошибка авторизации: ${err}`);
+      })
+      .finally(() => {
+        setIsDisabledInput(false);
+      });
+  };
 
-	const onRegister = (name, email, password) => {
-		setIsDisabledInput(true)
-		mainApi
-			.registration(name, email, password)
-			.then((data) => {
-				if (data) {
-					onLogin(email, password)
-				}
-			})
-			.catch((err) => {
-				setIsServerError(err)
-				console.error(`onRegister - ошибка: ${err}`);
-			})
-			.finally(() => {
-				setIsDisabledInput(false)
-			});
-	}
-
-	const onLogin = (email, password) => {
-		setIsDisabledInput(true)
-		mainApi
-			.authorization(email, password)
-			.then((data) => {
-				localStorage.setItem('token', data.token);
-				setLoggedIn(true);
-				navigate('/movies');
-			})
-			.catch((err) => {
-				setIsServerError(err)
-				console.error(`onLogin - ошибка: ${err}`)
-			})
-			.finally(() => {
-				setIsDisabledInput(false)
-			});
-	}
-
-	const handleUpdateUser = ({ name, email }) => {
+  const handleUpdateUser = ({ name, email }) => {
 		setIsDisabledInput(true)
 		mainApi
 			.setDataUser({ name, email })
@@ -139,9 +134,9 @@ const App = () => {
 	const handleSaveMovie = (movieCard) => {
 		mainApi
 			.addMovie(movieCard)
-			.then((movieCard) => {
-				setSavedMovies([movieCard, ...savedMovies])
-			})
+			.then((newMovie) => {
+        setSavedMovies(prevMovies => [...prevMovies, newMovie]);
+      })
 			.catch((err) => {
 				console.error(`handleSaveMovie - ошибка: ${err}`);
 			})
@@ -150,7 +145,7 @@ const App = () => {
 	const handleDeleteMovie = (movie) => {
 		if (!movie._id) {
 			const movieDelete = savedMovies.find((mov) => {
-				return mov.movieId === movie.id;
+				return mov._id === movie._id;
 			});
 			mainApi
 				.deleteMovie(movieDelete._id)
@@ -180,83 +175,41 @@ const App = () => {
 		}
 	};
 
-	return (
-		<CurrentUserContext.Provider value={currentUser}>
-			<div className="page">
-				<div className="page__container">
-					{headerEndpoints &&
-						<Header
-							loggedIn={loggedIn}
-						/>}
-					<Routes>
-						<Route
-							path="/"
-							element={<Main />}
-						/>
-						<Route
-							path="/movies"
-							element={
-								<ProtectedRoute
-									element={Movies}
-									loggedIn={loggedIn}
-									savedMovies={savedMovies}
-									onSaveMovie={handleSaveMovie}
-									onDeleteMovie={handleDeleteMovie}
-								/>}
-						/>
-						<Route
-							path="/saved-movies"
-							element={
-								<ProtectedRoute
-									element={SavedMovies}
-									loggedIn={loggedIn}
-									savedMovies={savedMovies}
-									onDeleteMovie={handleDeleteMovie}
-								/>}
-						/>
-						<Route path="/signup" element={loggedIn ?
-							<Navigate to="/movies" replace /> :
-							<Register
-								onRegister={onRegister}
-								isServerError={isServerError}
-								isDisabledInput={isDisabledInput}
-							/>
-						} />
+  const showHeader = ['/', '/movies', '/saved-movies', '/profile'].includes(location);
+  const footerEndpoints = ['/', '/movies', '/saved-movies'].includes(location);
 
-						<Route path="/signin" element={loggedIn ?
-							<Navigate to="/movies" replace /> :
-							<Login
-								onLogin={onLogin}
-								isServerError={isServerError}
-								isDisabledInput={isDisabledInput}
-							/>
-						} />
-						<Route
-							path="/profile"
-							element={
-								<ProtectedRoute
-									element={Profile}
-									loggedIn={loggedIn}
-									onExit={onExit}
+  return (
+    <CurrentUserContext.Provider value={currentUser}>
+      <div className="page">
+        <div className="page__container">
+          {showHeader && <Header />}
+          <Routes>
+            <Route
+              path="/"
+              element={<Home />}
+            />
+            <Route path="/signin" element={<Login onLogin={handleLogin} isServerError={isServerError} isDisabledInput={isDisabledInput} />} />
+            <Route path="/signup" element={<Register onRegister={handleRegistration} isServerError={isServerError} isDisabledInput={isDisabledInput} />} />
+            <Route path="*" element={<PageNotFound />} />
+            <Route element={<ProtectedRoute/>}>
+              <Route path="/movies" element={<Movies loggedIn={loggedIn} movies={movies} savedMovies={savedMovies} onSaveMovie={handleSaveMovie} onDeleteMovie={handleDeleteMovie}/>} />
+              <Route path="/saved-movies" element={<SavedMovies loggedIn={loggedIn} savedMovies={savedMovies} onDeleteMovie={handleDeleteMovie}/>} />
+              <Route path="/profile" element={<Profile loggedIn={loggedIn} onExit={logout}
 									setSubmitMessage={setSubmitMessage}
 									submitMessage={submitMessage}
 									handleUpdateUser={handleUpdateUser}
-									isDisabledInput={isDisabledInput}
-								/>}
-						/>
-						<Route
-							path="*"
-							element={<PageNotFound />}
-						/>
-					</Routes>
-					{footerEndpoints &&
-						<Footer
-							isLoggedIn={loggedIn}
-						/>}
-				</div>
-			</div>
-		</CurrentUserContext.Provider>
-	)
+									isDisabledInput={isDisabledInput}/>} />
+            </Route>
+          </Routes>
+          {footerEndpoints &&
+            <Footer
+              isLoggedIn={loggedIn}
+            />
+          }
+        </div>
+      </div>
+    </CurrentUserContext.Provider>
+  );
 }
 
 export default App;

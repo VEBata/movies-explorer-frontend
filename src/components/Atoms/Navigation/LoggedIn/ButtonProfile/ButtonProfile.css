@@ -1,0 +1,34 @@
+.button-profile__link {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 12px;
+  color: #FFFFFF;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  column-gap: 7px;
+  min-width: 89px;
+}
+
+.button-profile__link.burger-menu__button-profile {
+  margin: 250px 0 0;
+}
+
+.button-profile__image {
+  display: flex;
+  height: 11px;
+  width: 11px;
+  border-radius: 50%;
+  background-color: #0F4157;
+  padding: 8px;
+}
+
+.button-profile__image.active {
+  background-color: #313131;
+}
+
+@media (max-width: 769px) {
+  .button-profile__link.nav__button-profile_invisible {
+    visibility: hidden;
+  }
+}

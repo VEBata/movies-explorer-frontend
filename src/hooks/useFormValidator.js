@@ -25,7 +25,7 @@ export const useFormValidator = () => {
       [name]: event.target.validationMessage,
     });
 
-    setIsFormValid(event.target.closest(".form").checkValidity());
+    setIsFormValid(event.target.closest(".form"));
   };
 
   const resetForm = () => {

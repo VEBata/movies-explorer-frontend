@@ -1,22 +1,22 @@
-import MoviesCardList from '../MoviesCardList/MoviesCardList';
-import SearchForm from '../SearchForm/SearchForm';
-import { useEffect, useState } from 'react';
+import { MoviesCards } from '../MoviesCards/MoviesCards';
+import { SearchForm } from '../../../components/Atoms/SearchForm/SearchForm';
+import { useEffect, useState, useCallback } from 'react';
 import { filterByDuration, filterMovies } from '../../../utils/MoviesFilter';
+import './SavedMovies.css'
 
-
-const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
+export const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
 	const [filteredMoviesList, setFilteredMoviesList] = useState(savedMovies);
 	const [isCheckboxActive, setIsCheckboxActive] = useState(false);
 	const [isNotFound, setIsNotFound] = useState(false);
 	const [searchRequest, setSearchRequest] = useState('');
 
-	const onSearchMovies = (req) => {
+	const onSearchMovies = useCallback((req) => {
 		setSearchRequest(req);
-	}
+	}, []);
 
-	const handleShortMovies = () => {
-		setIsCheckboxActive(!isCheckboxActive);
-	}
+	const handleShortMovies = useCallback(() => {
+		setIsCheckboxActive(prevState => !prevState);
+	}, []);
 
 	useEffect(() => {
 		const moviesList = filterMovies(savedMovies, searchRequest);
@@ -24,19 +24,15 @@ const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
 	}, [savedMovies, isCheckboxActive, searchRequest]);
 
 	useEffect(() => {
-		if (filteredMoviesList.length === 0) {
-			setIsNotFound(true);
-		} else {
-			setIsNotFound(false);
-		}
+		setIsNotFound(filteredMoviesList.length === 0);
 	}, [filteredMoviesList]);
 
 	return (
-		<main className="content">
+		<main className='saved-movies'>
 			<SearchForm
 				onSearch={onSearchMovies}
 				onFilter={handleShortMovies} />
-			<MoviesCardList
+			<MoviesCards
 				savedMovies={savedMovies}
 				isNotFound={isNotFound}
 				isSavedFilms={true}
@@ -46,5 +42,3 @@ const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
 		</main>
 	)
 }
-
-export default SavedMovies;

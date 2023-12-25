@@ -1,33 +1,32 @@
-import './PageWithForm.css';
 import { Link } from 'react-router-dom';
 import logo from '../../images/logo.svg';
+import './PageWithForm.css';
 
-const PageWithForm = ({ title, name, onSubmit, children, question, link, linkTitle }) => {
+export const PageWithForm = ({ title, name, onSubmit, children, question, link, linkTitle }) => {
 	return (
-		<section className="page-form">
-			<div className="page-form__container">
+		<section className='page-form'>
+			<div className='page-form__container'>
 				<Link
 					to='/'
-					className='page-form__logo link'
+					className='link page-form__link'
 				>
 					<img
 						src={logo}
 						alt="Логотип"
 					/>
 				</Link>
-				<h1 className="page-form__title">{title}</h1>
-				<form
-					className="page-form__form form"
+				<h1 className='page-form__form-title'>{title}</h1>
+				<div
+					className="form page-form__form"
 					name={name}
-					onSubmit={onSubmit}
 					noValidate
 				>
 					{children}
-				</form>
+				</div>
 				<div className="page-form__wrapper">
 					<p className="page-form__text">{question}</p>
 					<Link
-						className="page-form__link link"
+						className="link page-form__form-link"
 						to={link}
 					>
 						{linkTitle}
@@ -37,5 +36,3 @@ const PageWithForm = ({ title, name, onSubmit, children, question, link, linkTit
 		</section>
 	);
 }
-
-export default PageWithForm;
