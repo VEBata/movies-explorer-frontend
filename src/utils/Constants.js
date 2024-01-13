@@ -1,4 +1,5 @@
-const BASE_URL = "api.khve.nomoredomainsrocks.ru";
+// const BASE_URL = 'http://localhost:3000'
+const BASE_URL = "https://api.khve.nomoredomainsrocks.ru";
 const MOVIES_API_IMG_URL = "https://api.nomoreparties.co";
 const MOVIES_API_URL = "https://api.nomoreparties.co/beatfilm-movies";
 
