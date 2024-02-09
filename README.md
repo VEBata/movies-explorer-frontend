@@ -6,7 +6,7 @@
 
 ## Проект
 
-IP 158.160.100.21
+IP 51.250.89.149
 
 [Frontend](https://khve.nomoredomainsrocks.ru)
 

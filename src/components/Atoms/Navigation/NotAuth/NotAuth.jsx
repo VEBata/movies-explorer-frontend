@@ -17,21 +17,14 @@ export const NotAuth = () => {
 
   return (
     <ul className="not-auth__list">
-      {buttons.map((button, i) => (
-        <li key={i} className={`not-auth__item ${button.button ? 'link' : ''}`}>
-          {
-            !button.button ? (
-              <NavLink to={button.to} className='not-auth__link-native'>
-                {button.text}
-              </NavLink>
-            ) : (
-              <NavLink className="not-auth__link" to={button.to}>
-                {button.text}
-              </NavLink>
-            )
-          }
-        </li>
-      ))}
+      {buttons.map((button, i) => {
+        const buttonClass = button.button ? 'not-auth__link' : 'not-auth__link-native';
+        return <NavLink to={button.to} className={buttonClass}>
+          <li key={i} className={`not-auth__item ${button.button ? 'link' : ''}`}>
+            {button.text}
+          </li>
+        </NavLink>
+      })}
     </ul>
   )
 }

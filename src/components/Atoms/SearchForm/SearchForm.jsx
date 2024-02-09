@@ -1,23 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
 import { EMPTY_REQUEST, MOVIE_TITLE } from '../../../utils/Constants';
 import './SearchForm.css';
 
-export const SearchForm = ({ onSearch, onFilter, isCheckboxActive }) => {
-  const location = useLocation().pathname;
-  const [searchValue, setSearchValue] = useState("");
+export const SearchForm = ({ onSearch, onFilter, isCheckboxActive, searchValue }) => {
   const [isError, setIsError] = useState(false);
 
-  useEffect(() => {
-    if (location === '/saved-movies') {
-      setSearchValue('');
-    }
-  }, [location]);
 
   const changeSearch = (e) => {
-    setSearchValue(e.target.value);
-  }
+    onSearch(e.target.value);
+  } 
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,7 +28,7 @@ export const SearchForm = ({ onSearch, onFilter, isCheckboxActive }) => {
           <input className='search__input'
             type="text"
             name='search'
-            value={searchValue || ""}
+            value={searchValue}
             placeholder={isError ? EMPTY_REQUEST : MOVIE_TITLE}
             onChange={changeSearch}
             required

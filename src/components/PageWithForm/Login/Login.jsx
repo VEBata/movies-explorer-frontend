@@ -3,45 +3,33 @@ import { Input } from '../../Atoms/Input/Input';
 import { SubmitButton } from '../../Atoms/SubmitButton/SubmitButton';
 import { PageWithForm } from '../PageWithForm';
 import './Login.css';
-import { useState, useEffect } from 'react';
+import { useFormValidator } from '../../../hooks/useFormValidator';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAsyncTask } from '../../../hooks/useAsyncTask';
+import { authorization } from '../../../utils/MainApi';
 
 export const Login = ({ onLogin, isServerError, isDisabledInput }) => {
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
-	const [isFormValid, setIsFormValid] = useState(false);
-	const [errors, setErrors] = useState({});
-	useEffect(() => {
-		setEmail('')
-    setPassword('')
-		setErrors({})
-		setIsFormValid(false)
-	}, []);
+	const { values, getProps, isFormValid } = useFormValidator({ email: '', password: '' })
 
-	const onSubmit = async(evt) => {
+	console.log(values);
+
+	const [authorizationTask, isAuthorizationPenfing] = useAsyncTask(authorization)
+
+	const navigate = useNavigate()
+
+	const onSubmit = async (evt) => {
 		evt.preventDefault();
-		await onLogin(email, password);
+		if (!isFormValid) return
+		if (isDisabledInput) return
+		
+		await onLogin(authorizationTask(values.email, values.password));
 		// resetForm()
 	};
 
-  const handleChangeEmail = (event) => {
-    setEmail(event.target.value)
-    setErrors({
-      ...errors,
-      email: event.target.validationMessage,
-    });
-
-    setIsFormValid(event.target.closest(".form"));
-  }
-
-  const handleChangePassword = (event) => {
-    setPassword(event.target.value)
-    setErrors({
-      ...errors,
-      password: event.target.validationMessage
-    });
-
-    setIsFormValid(event.target.closest(".form"));
-  }
+	useEffect(() => {
+		if (localStorage.getItem('token')) navigate('/')
+	}, [])
 
 	return (
 		<main className="content login">
@@ -51,39 +39,34 @@ export const Login = ({ onLogin, isServerError, isDisabledInput }) => {
 				question="Ещё не зарегистрированы?"
 				link="/signup"
 				linkTitle="Регистрация"
-				// onLogin={onLogin}
+				onSubmit={onSubmit}
+			// onLogin={onLogin}
 			>
 				<div className='login__wrapper'>
 					<Input
-						name="email"
 						type="email"
 						title="E-mail"
-						value={email || ''}
 						pattern="^\S+@\S+\.\S+$"
-						onChange={handleChangeEmail}
 						required={true}
-						validationMessage={errors.email}
 						minLength="2"
 						placeholder="E-mail"
 						className='input_type_login'
 						inputClassName="input_type_login"
 						errorClassName="input__error_type_login"
 						disabled={isDisabledInput}
+						{...getProps('email')}
 					/>
 					<Input
-						name="password"
 						type="password"
 						title="Пароль"
-						value={password || ''}
-						onChange={handleChangePassword}
 						required={true}
-						validationMessage={errors.password}
 						minLength="8"
 						maxLength="30"
 						placeholder="Введите пароль"
 						inputClassName="input_type_login"
 						errorClassName="input__error_type_login"
 						disabled={isDisabledInput}
+						{...getProps('password')}
 					/>
 				</div>
 				<span className="login__error">
@@ -91,8 +74,7 @@ export const Login = ({ onLogin, isServerError, isDisabledInput }) => {
 				</span>
 				<SubmitButton
 					title="Войти"
-					isFormValid={isFormValid}
-					onClick={(e) => onSubmit(e)}
+					isFormValid={isFormValid && !isAuthorizationPenfing}
 				/>
 			</PageWithForm>
 		</main>

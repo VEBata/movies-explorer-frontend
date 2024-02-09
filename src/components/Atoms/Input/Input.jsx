@@ -12,6 +12,7 @@ export const Input = ({
 	minLength,
 	maxLength,
 	required,
+	inputRef,
 }) => {
 
 	return (
@@ -31,6 +32,7 @@ export const Input = ({
 				minLength={minLength}
 				maxLength={maxLength}
 				required={required}
+				ref={inputRef}
 			/>
 			<span className={`input__error ${validationMessage ? `input__error_visible` : ""}`}>
 				{validationMessage}

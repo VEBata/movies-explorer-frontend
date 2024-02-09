@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-export const useFormValidator = () => {
-  const [values, setValues] = useState({});
+export const useFormValidator = (initialState = {}) => {
+  const [values, setValues] = useState(initialState);
   const [errors, setErrors] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
+  const inputsRef = useRef({}) 
+  const [_isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
-    setValues({});
     setErrors({});
     setIsFormValid(false);
   }, []);
@@ -29,10 +29,20 @@ export const useFormValidator = () => {
   };
 
   const resetForm = () => {
-    setValues({});
+    setValues(initialState);
     setErrors({});
     setIsFormValid(false);
   };
+
+  const getProps = (name) => ({
+    name,
+    onChange: handleChange,
+    value: values[name],
+    validationMessage: errors[name],
+    inputRef: el => inputsRef.current[name] = (el)
+  })
+
+  const isFormValid = Object.values(inputsRef.current).every(x=>x.validity?.valid)
 
   return {
     values,
@@ -42,5 +52,6 @@ export const useFormValidator = () => {
     setValues,
     handleChange,
     resetForm,
+    getProps,
   };
 };

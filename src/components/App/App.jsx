@@ -25,17 +25,19 @@ function App() {
   const [isDisabledInput, setIsDisabledInput] = useState(false);
   const [savedMovies, setSavedMovies] = useState([]);
   const [movies, setMovies] = useState([]);
+  const [isMoviesLoading, setIsMoviesLoading] = useState(false);
 
   const [token, setToken] = useState('')
   const [submitMessage, setSubmitMessage] = useState('');
 
   useEffect(() => {
     if (token && localStorage.getItem('token')) {
+      setIsMoviesLoading(true)
       Promise.all([mainApi.getDataUser(), movieApi.getMovies()])
         .then(([userData, moviesData]) => {
           setCurrentUser(userData);
-          localStorage.setItem('allMovies', JSON.stringify(moviesData.reverse()))
           setMovies(moviesData.reverse());
+          setIsMoviesLoading(false)
         })
         .catch(err => console.error(`Error: ${err}`));
     }
@@ -53,10 +55,11 @@ function App() {
           console.error(`Error: ${err}`);
           logout();
         });
+      setIsMoviesLoading(true)
       movieApi.getMovies()
         .then((data) => {
           setMovies(data)
-          localStorage.setItem('allMovies', JSON.stringify(data))
+          setIsMoviesLoading(false)
         })
       mainApi.getDataMovies()
         .then(data => {
@@ -72,17 +75,17 @@ function App() {
     setCurrentUser({});
   };
 
-  const handleRegistration = async (name, email, password) => {
+  const handleRegistration = async (name, email, password, data) => {
     setIsDisabledInput(true);
 
-    await mainApi.registration(name, email, password)
-      .then(async(data) => {
+    await data
+      .then(async (data) => {
         setTimeout(async () => {
           if (data) {
-            await handleLogin(email, password);
+            await handleLogin(mainApi.authorization(email, password));
           }
         }, 1000)
-        
+
       })
       .catch((err) => {
         setIsServerError(err.message || 'Ошибка регистрации');
@@ -93,12 +96,13 @@ function App() {
       });
   };
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async (autorizationTask) => {
     setIsDisabledInput(false);
-    mainApi.authorization(email, password)
+    autorizationTask
       .then((data) => {
         if (data && data.token) {
           localStorage.setItem('token', data.token);
+          setToken(data.token)
           setLoggedIn(true);
           navigate('/movies');
         } else {
@@ -115,65 +119,50 @@ function App() {
   };
 
   const handleUpdateUser = ({ name, email }) => {
-		setIsDisabledInput(true)
-		mainApi
-			.setDataUser({ name, email })
-			.then(() => {
-				setCurrentUser({ name, email });
-				setSubmitMessage(PROFILE_UPDATE_COMPLETED)
-			})
-			.catch((err) => {
-				setSubmitMessage(PROFILE_UPDATE_ERROR)
-				console.error(`handleUpdateUser - ошибка: ${err}`)
-			})
-			.finally(() => {
-				setIsDisabledInput(false)
-			})
-	}
+    setIsDisabledInput(true)
+    mainApi
+      .setDataUser({ name, email })
+      .then(() => {
+        setCurrentUser({ name, email });
+        setSubmitMessage(PROFILE_UPDATE_COMPLETED)
+      })
+      .catch((err) => {
+        setSubmitMessage(PROFILE_UPDATE_ERROR)
+        console.error(`handleUpdateUser - ошибка: ${err}`)
+      })
+      .finally(() => {
+        setIsDisabledInput(false)
+      })
+  }
 
-	const handleSaveMovie = (movieCard) => {
-		mainApi
-			.addMovie(movieCard)
-			.then((newMovie) => {
+  const handleSaveMovie = (movieCard) => {
+    mainApi
+      .addMovie(movieCard)
+      .then((newMovie) => {
         setSavedMovies(prevMovies => [...prevMovies, newMovie]);
       })
-			.catch((err) => {
-				console.error(`handleSaveMovie - ошибка: ${err}`);
-			})
-	}
+      .catch((err) => {
+        console.error(`handleSaveMovie - ошибка: ${err}`);
+      })
+  }
 
-	const handleDeleteMovie = (movie) => {
-		if (!movie._id) {
-			const movieDelete = savedMovies.find((mov) => {
-				return mov._id === movie._id;
-			});
-			mainApi
-				.deleteMovie(movieDelete._id)
-				.then(() => {
-					setSavedMovies(
-						savedMovies.filter((mov) => {
-							return mov._id !== movieDelete._id;
-						})
-					);
-				})
-				.catch((err) => {
-					console.log(err)
-				})
-		} else {
-			mainApi
-				.deleteMovie(movie._id)
-				.then(() => {
-					setSavedMovies(
-						savedMovies.filter((mov) => {
-							return mov._id !== movie._id;
-						})
-					);
-				})
-				.catch((err) => {
-					console.log(err)
-				})
-		}
-	};
+  const handleDeleteMovie = (movie) => {
+    if (!movie._id) return
+
+    mainApi
+      .deleteMovie(movie._id)
+      .then(() => {
+        setSavedMovies(
+          savedMovies.filter((mov) => {
+            return mov._id !== movie._id;
+          })
+        );
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
+  };
 
   const showHeader = ['/', '/movies', '/saved-movies', '/profile'].includes(location);
   const footerEndpoints = ['/', '/movies', '/saved-movies'].includes(location);
@@ -191,14 +180,14 @@ function App() {
             <Route path="/signin" element={<Login onLogin={handleLogin} isServerError={isServerError} isDisabledInput={isDisabledInput} />} />
             <Route path="/signup" element={<Register onRegister={handleRegistration} isServerError={isServerError} isDisabledInput={isDisabledInput} />} />
             <Route path="*" element={<PageNotFound />} />
-            <Route element={<ProtectedRoute/>}>
-              <Route path="/movies" element={<Movies loggedIn={loggedIn} movies={movies} savedMovies={savedMovies} onSaveMovie={handleSaveMovie} onDeleteMovie={handleDeleteMovie}/>} />
-              <Route path="/saved-movies" element={<SavedMovies loggedIn={loggedIn} savedMovies={savedMovies} onDeleteMovie={handleDeleteMovie}/>} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/movies" element={<Movies loggedIn={loggedIn} movies={movies} savedMovies={savedMovies} onSaveMovie={handleSaveMovie} onDeleteMovie={handleDeleteMovie} isLoading={isMoviesLoading} />} />
+              <Route path="/saved-movies" element={<SavedMovies loggedIn={loggedIn} savedMovies={savedMovies} onDeleteMovie={handleDeleteMovie} />} />
               <Route path="/profile" element={<Profile loggedIn={loggedIn} onExit={logout}
-									setSubmitMessage={setSubmitMessage}
-									submitMessage={submitMessage}
-									handleUpdateUser={handleUpdateUser}
-									isDisabledInput={isDisabledInput}/>} />
+                setSubmitMessage={setSubmitMessage}
+                submitMessage={submitMessage}
+                handleUpdateUser={handleUpdateUser}
+                isDisabledInput={isDisabledInput} />} />
             </Route>
           </Routes>
           {footerEndpoints &&

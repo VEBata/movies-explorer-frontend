@@ -16,13 +16,14 @@ export const PageWithForm = ({ title, name, onSubmit, children, question, link, 
 					/>
 				</Link>
 				<h1 className='page-form__form-title'>{title}</h1>
-				<div
+				<form
 					className="form page-form__form"
 					name={name}
+					onSubmit={onSubmit}
 					noValidate
 				>
 					{children}
-				</div>
+				</form>
 				<div className="page-form__wrapper">
 					<p className="page-form__text">{question}</p>
 					<Link

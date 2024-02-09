@@ -3,12 +3,13 @@ import { SearchForm } from '../../../components/Atoms/SearchForm/SearchForm';
 import { useEffect, useState, useCallback } from 'react';
 import { filterByDuration, filterMovies } from '../../../utils/MoviesFilter';
 import './SavedMovies.css'
+import { useLocalStorageState } from '../../../hooks/useLocalStorageState';
 
 export const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
 	const [filteredMoviesList, setFilteredMoviesList] = useState(savedMovies);
-	const [isCheckboxActive, setIsCheckboxActive] = useState(false);
+	const [isCheckboxActive, setIsCheckboxActive] = useLocalStorageState(false, 'shortMoviesSaved');
 	const [isNotFound, setIsNotFound] = useState(false);
-	const [searchRequest, setSearchRequest] = useState('');
+	const [searchRequest, setSearchRequest] = useLocalStorageState('', 'searchMoviesSaved');
 
 	const onSearchMovies = useCallback((req) => {
 		setSearchRequest(req);
@@ -31,6 +32,8 @@ export const SavedMovies = ({ savedMovies, onDeleteMovie }) => {
 		<main className='saved-movies'>
 			<SearchForm
 				onSearch={onSearchMovies}
+				searchValue={searchRequest}
+				isCheckboxActive={isCheckboxActive}
 				onFilter={handleShortMovies} />
 			<MoviesCards
 				savedMovies={savedMovies}

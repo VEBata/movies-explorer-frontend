@@ -14,7 +14,7 @@
   line-height: 16px;
 }
 
-.not-auth__item:last-child {
+.not-auth__item.link {
   border: none;
   outline: 0;
   cursor: pointer;

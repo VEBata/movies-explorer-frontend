@@ -7,7 +7,7 @@ export const SubmitButton = ({ title, isFormValid, onClick }) => {
 			className={`submit-button button ${!isFormValid ? `button-submit_disabled` : ""}`}
 			type="submit"
 			disabled={!isFormValid}
-			onClick={onClick}
+			onClick={(e) => isFormValid && onClick?.(e)}
 		>
 			{title}
 		</button>

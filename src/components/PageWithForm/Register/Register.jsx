@@ -3,14 +3,31 @@ import { Input } from '../../Atoms/Input/Input';
 import { SubmitButton } from '../../Atoms/SubmitButton/SubmitButton';
 import { PageWithForm } from '../PageWithForm';
 import { useFormValidator } from "../../../hooks/useFormValidator";
+import { registration } from '../../../utils/MainApi';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAsyncTask } from '../../../hooks/useAsyncTask';
 
 export const Register = ({ onRegister, isServerError, isDisabledInput }) => {
-	const { values, errors, isFormValid, handleChange, resetForm } = useFormValidator();
+	const { values, isFormValid, resetForm, getProps } = useFormValidator({
+		name: '',
+		email: '',
+		password: '',
+	});
 
-	const onSubmit = (evt) => {
+	const [registrationTask, isRegistrationPending] = useAsyncTask(registration)
+
+	const navigate = useNavigate()
+
+	useEffect(()=>{
+		if(localStorage.getItem('token')) navigate('/')
+	},[])
+
+	const onSubmit = async (evt) => {
 		evt.preventDefault();
-		onRegister(values.name, values.email, values.password);
-		resetForm()
+		if(isRegistrationPending) return
+		const res = registrationTask(values.name, values.email, values.password)
+		onRegister(values.name, values.email, values.password, res);
 	};
 
 	return (
@@ -21,46 +38,38 @@ export const Register = ({ onRegister, isServerError, isDisabledInput }) => {
 				question="Уже зарегистрированы?"
 				link="/signin"
 				linkTitle="Войти"
+				onSubmit={onSubmit}
 			>
 				<div className='register__wrapper'>
 					<Input
-						name="name"
 						type="text"
 						title="Имя"
-						value={values.name || ''}
-						onChange={handleChange}
 						required={true}
 						minLength="2"
 						maxLength="30"
 						placeholder="Имя"
-						validationMessage={errors.name}
 						disabled={isDisabledInput}
+						{...getProps('name')}
 					/>
 					<Input
-						name="email"
 						type="email"
 						title="E-mail"
-						value={values.email || ''}
 						pattern="^\S+@\S+\.\S+$"
-						onChange={handleChange}
 						required={true}
 						minLength="2"
 						placeholder="E-mail"
-						validationMessage={errors.email}
 						disabled={isDisabledInput}
+						{...getProps('email')}
 					/>
 					<Input
-						name="password"
 						type="password"
 						title="Пароль"
-						value={values.password || ''}
-						onChange={handleChange}
 						required={true}
 						minLength="8"
 						maxLength="30"
 						placeholder="Введите пароль"
-						validationMessage={errors.password}
 						disabled={isDisabledInput}
+						{...getProps('password')}
 					/>
 				</div>
 				<span className='register__error'>
@@ -68,8 +77,7 @@ export const Register = ({ onRegister, isServerError, isDisabledInput }) => {
 				</span>
 				<SubmitButton
 					title="Зарегистрироваться"
-					isFormValid={isFormValid}
-          onClick={onSubmit}
+					isFormValid={isFormValid && !isRegistrationPending }
 				/>
 			</PageWithForm>
 		</main>
