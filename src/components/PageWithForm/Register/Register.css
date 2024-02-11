@@ -1,0 +1,23 @@
+.register {
+  display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.register__wrapper {
+  min-height: 266px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.register__error {
+  font-weight: 400;
+	font-size: 11px;
+	line-height: 13px;
+	color: #FF004C;
+	text-align: center;
+	margin: 36px 0 20px;
+	height: 0;
+}

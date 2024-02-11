@@ -1,0 +1,14 @@
+.message {
+  font-weight: 500;
+	font-size: 18px;
+	line-height: 22px;
+	margin: 70px auto 0;
+	max-width: 600px;
+}
+
+@media (max-width: 420px) {
+  .message {
+    font-size: 12px;
+		line-height: 15px;
+  }
+}
